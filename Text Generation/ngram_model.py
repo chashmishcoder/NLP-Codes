@@ -157,23 +157,128 @@ class NGramModel:
         perplexity = 2 ** (-avg_log_prob)
         
         return perplexity
-
 def load_ag_news():
-    """Load the AG News dataset from HuggingFace datasets."""
+    """Load the AG News dataset or create a larger local dataset."""
     try:
+        print("Attempting to load AG News dataset...")
         from datasets import load_dataset
         dataset = load_dataset("ag_news")
-        # Combine title and text to form the corpus
-        train_texts = [f"{item['title']} {item['text']}" for item in dataset["train"]]
-        return " ".join(train_texts)
-    except:
-        # Fallback to a smaller sample if loading fails
-        print("Failed to load AG News dataset. Using a sample text instead.")
-        return """The technology industry continues to evolve rapidly with innovations in AI and robotics.
-                 Climate change remains a significant global challenge as temperatures rise worldwide.
-                 Economic indicators show mixed signals as inflation concerns persist in major markets.
-                 Sports teams prepare for upcoming championships with intensive training sessions.
-                 Healthcare advances include new treatments for chronic diseases and improved diagnostics.""" * 20
+        print(f"Successfully loaded AG News dataset with {len(dataset['train'])} training examples")
+        
+        # Print dataset structure for debugging
+        print("Dataset structure:")
+        print("Keys in dataset:", dataset.keys())
+        print("Columns in train set:", dataset['train'].column_names)
+        print("First example:", dataset['train'][0])
+        
+        # Correctly extract text based on the actual structure
+        if 'text' in dataset['train'].column_names:
+            # If dataset has both title and text fields
+            if 'title' in dataset['train'].column_names:
+                train_texts = [f"{item['title']} {item['text']}" for item in dataset['train']]
+            else:
+                train_texts = [item['text'] for item in dataset['train']]
+        else:
+            # Fall back to using the raw data as is
+            train_texts = [str(item) for item in dataset['train']]
+            
+        corpus = " ".join(train_texts)
+        print(f"Created corpus with {len(corpus)} characters")
+        return corpus
+    except Exception as e:
+        print(f"Failed to load AG News dataset. Error: {e}")
+        print("Creating a larger local dataset instead.")
+        
+        # Create a larger local dataset for better n-gram training
+        local_corpus = """
+        TECHNOLOGY NEWS:
+        The technology industry continues to evolve rapidly with innovations in AI and robotics.
+        Apple unveils new iPhone with enhanced AI capabilities and improved battery life.
+        Microsoft announces significant updates to Windows operating system with new features.
+        Google's latest algorithm update aims to improve search results for users worldwide.
+        Amazon expands cloud computing services with new data centers in multiple regions.
+        Tesla introduces advanced self-driving features for its electric vehicle lineup.
+        SpaceX successfully launches rocket carrying satellites for global internet coverage.
+        Cybersecurity experts warn of increasing ransomware attacks targeting businesses.
+        New semiconductor technology promises faster and more energy-efficient computing.
+        Social media platforms implement new features to combat misinformation and fake news.
+        
+        WORLD NEWS:
+        Climate change remains a significant global challenge as temperatures rise worldwide.
+        International summit on climate change concludes with new emissions reduction targets.
+        Diplomatic tensions rise between major powers over disputed territorial claims.
+        United Nations calls for increased humanitarian aid in conflict-affected regions.
+        Peace negotiations continue in attempt to resolve long-standing regional conflicts.
+        Global health organization reports decrease in communicable disease rates worldwide.
+        International trade agreements face scrutiny amid changing economic relationships.
+        Cultural exchange programs promote understanding between diverse nations and peoples.
+        Environmental conservation efforts receive boost from multinational cooperation.
+        World leaders discuss strategies to address migration challenges at annual forum.
+        
+        BUSINESS NEWS:
+        Economic indicators show mixed signals as inflation concerns persist in major markets.
+        Stock markets react to central bank decisions on interest rates and monetary policy.
+        Investors are concerned about potential economic slowdown affecting global markets.
+        Major merger between industry leaders reshapes competitive landscape in key sector.
+        Startup companies attract record venture capital funding in emerging technology fields.
+        Consumer spending trends indicate shifting preferences in post-pandemic economy.
+        Supply chain disruptions continue to affect manufacturing and retail industries.
+        Corporate sustainability initiatives gain prominence among leading businesses.
+        Financial regulators propose new frameworks for cryptocurrency oversight.
+        Labor market shows resilience despite economic uncertainties in various sectors.
+        
+        SPORTS NEWS:
+        Sports teams prepare for upcoming championships with intensive training sessions.
+        Olympic athletes break records in multiple events during international competition.
+        Football club announces signing of star player in record-breaking transfer deal.
+        Basketball tournament concludes with dramatic overtime victory in final game.
+        Tennis champion defends title in grueling five-set match against top challenger.
+        Golf tournament attracts worldwide audience as players compete for prestigious trophy.
+        Racing team unveils new vehicle design with advanced aerodynamic features.
+        Cricket match ends in historic result after exceptional individual performance.
+        Swimming competition showcases emerging talent alongside established champions.
+        Team sports emphasize importance of mental health support for professional athletes.
+        
+        HEALTH NEWS:
+        Healthcare advances include new treatments for chronic diseases and improved diagnostics.
+        Medical researchers announce breakthrough in understanding rare genetic disorders.
+        Vaccine development accelerates for prevalent infectious diseases affecting populations.
+        Public health campaigns focus on preventative measures for community wellbeing.
+        Telemedicine services expand to provide greater access to healthcare specialists.
+        Mental health awareness initiatives receive support from healthcare institutions.
+        Nutritional studies reveal connections between diet and long-term health outcomes.
+        Fitness trends emphasize personalized approaches to physical wellness and activity.
+        Medical technology innovations improve surgical procedures and patient recovery.
+        Healthcare systems implement reforms to address accessibility and affordability concerns.
+        
+        SCIENCE NEWS:
+        Astronomical observations reveal new insights about distant planetary systems.
+        Genetic research advances understanding of evolutionary relationships between species.
+        Physics experiment confirms theoretical predictions about fundamental particles.
+        Marine biologists document previously unknown species in deep ocean environments.
+        Geological studies provide information about Earth's historical climate patterns.
+        Artificial intelligence assists researchers in analyzing complex scientific data.
+        Conservation efforts focus on protecting biodiversity in threatened ecosystems.
+        Renewable energy research develops more efficient solar and wind power technologies.
+        Neuroscience studies enhance knowledge of brain function and cognitive processes.
+        Scientific collaboration across disciplines addresses complex global challenges.
+        
+        EDUCATION NEWS:
+        Educational institutions implement innovative teaching methods using digital tools.
+        Research universities announce expanded scholarship programs for diverse students.
+        Online learning platforms provide accessible education to global participants.
+        STEM education initiatives encourage student interest in technical career paths.
+        Educational policy reforms address challenges in learning assessment and outcomes.
+        Teacher training programs focus on inclusive approaches to classroom instruction.
+        International education exchanges promote cross-cultural understanding and cooperation.
+        Literacy programs show positive results in improving reading skills for young learners.
+        Educational technology enhances student engagement with interactive learning materials.
+        Lifelong learning becomes priority as workforce adapts to changing skill requirements.
+        """
+        print(f"Created local corpus with {len(local_corpus)} characters")
+        return local_corpus
+
+
 
 if __name__ == "__main__":
     # Load corpus
