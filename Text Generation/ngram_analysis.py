@@ -40,7 +40,6 @@ def analyze_repetition(text):
     trigram_repetition = sum(count for count in trigram_counts.values() if count > 1) / len(trigrams) if trigrams else 0
     
     return bigram_repetition, trigram_repetition
-
 def compare_models():
     """Train and compare N-gram models with different values of N."""
     # Load corpus
@@ -80,7 +79,6 @@ def compare_models():
     print("Saved perplexity comparison plot to 'perplexity_comparison.png'")
     
     return models
-
 def compare_generation_methods(models):
     """Compare different text generation methods across models."""
     seed_sentences = [
