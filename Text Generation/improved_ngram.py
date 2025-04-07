@@ -310,6 +310,7 @@ class ImprovedNGramModel:
         
         return perplexity
 
+
 def compare_smoothing_methods():
     """Compare the performance of different smoothing methods."""
     # Load corpus
